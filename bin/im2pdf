@@ -1,0 +1,20 @@
+#!python
+import os, sys
+from PIL import Image
+
+if len(sys.argv)!=2 and len(sys.argv)!=3:
+    print("Usage: \r im2pdf image-filename.jpg")
+    exit()
+
+assert os.path.isfile(sys.argv[1]), "image file %s not found" % sys.argv[1]
+
+if len(sys.argv) == 3:
+    if sys.argv[1].ends_with(".pdf"):
+        pdf = sys.argv[2]
+    else:
+        pdf = sys.argv[2] + ".pdf"
+else:
+    fn, ext = os.path.splitext(sys.argv[1])
+    pdf = sys.argv[1].replace(ext, ".pdf")
+
+Image.open(sys.argv[1]).save(pdf)
