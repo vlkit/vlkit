@@ -2,6 +2,7 @@ import numpy as np
 from PIL import Image
 import os, sys
 from os.path import join, split, splitext, isdir, isfile, abspath
+import skimage
 
 __img_ext__ = ['jpg', 'jpeg', 'png', 'bmp']
 
@@ -106,3 +107,40 @@ def hwc2nchw(image):
             data[i, :, :, :] = im.transpose((2, 0, 1))
 
     return data
+
+def overlay(img, mask, color=[255, 0, 0], alpha=0.5):
+    img = skimage.img_as_float(img)
+    mask = mask.astype(bool)
+    color = np.array(color).reshape((1, 1, 3))
+    color_mask = np.zeros_like(img)
+    color_mask[mask, :] = color
+
+    img_hsv = skimage.color.rgb2hsv(img)
+    color_mask_hsv = skimage.color.rgb2hsv(color_mask)
+
+    img_hsv[mask, 0] = color_mask_hsv[mask, 0]
+    img_hsv[mask, 1] = color_mask_hsv[mask, 1] * alpha
+
+    img = skimage.color.hsv2rgb(img_hsv)
+    img /= img.max()
+    img *= 255
+    img = img.astype(np.uint8)
+
+    return img
+
+
+if __name__ == "__main__":
+    import matplotlib
+    import matplotlib.pyplot as plt
+    img = skimage.data.astronaut()
+    H, W, _ = img.shape
+    mask = np.zeros((H, W), dtype=bool)
+    mask[100:150, :] = 1
+
+    img = overlay(img, mask)
+    mask = np.zeros((H, W), dtype=bool)
+    mask[200:250, :] = 1
+    img = overlay(img, mask, color=[0, 255, 0])
+
+    plt.imshow(img)
+    plt.show()
