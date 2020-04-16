@@ -1,6 +1,19 @@
 import os, re, logging
 from os.path import join, isdir
 
+def get_logger(path="log.txt"):
+    logger = logging.getLogger("Logger")
+    file_handler = logging.FileHandler(path, "w")
+    stdout_handler = logging.StreamHandler()
+    logger.addHandler(file_handler)
+    logger.addHandler(stdout_handler)
+    logformatter = logging.Formatter('[%(asctime)s] p%(process)s {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s','%m-%d %H:%M:%S')
+    stdout_handler.setFormatter(logformatter)
+    file_handler.setFormatter(logformatter)
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+    return logger
+
 class Logger():
     def __init__(self, path="log.txt"):
         self.logger = logging.getLogger("Logger")
@@ -8,8 +21,9 @@ class Logger():
         self.stdout_handler = logging.StreamHandler()
         self.logger.addHandler(self.file_handler)
         self.logger.addHandler(self.stdout_handler)
-        self.stdout_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
-        self.file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
+        logformatter = logging.Formatter('[%(asctime)s] p%(process)s {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s','%m-%d %H:%M:%S')
+        self.stdout_handler.setFormatter(logformatter)
+        self.file_handler.setFormatter(logformatter)
         self.logger.setLevel(logging.INFO)
     
     def info(self, txt):
