@@ -35,6 +35,6 @@ setup(name='vlkit',
     install_requires=["numpy"],
     zip_safe=False,
     data_files=[("data", ["vlkit/data/imagenet1000_clsidx_to_labels.txt"])],
-    package_data={"vlkit.nms": ["nms.h"]},
+    package_data={"vlkit.nms": ["nms.h", "vlkit/nms/nms_ext.pyx"]},
     cmdclass={"build": build},
 )
