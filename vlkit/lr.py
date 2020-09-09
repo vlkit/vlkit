@@ -1,5 +1,5 @@
 # iteration-wise learning rate control for pytorch
-# lr_scheduler = CosAnnealingLR(loader_len=5005, epochs=120, max_lr=0.1, warmup_epochs=5)
+# lr_scheduler = CosAnnealingLR(epoch_size=5005, epochs=120, max_lr=0.1, warmup_epochs=5)
 # Note that you should call lr_scheduler.step() before EACH ITERATION rather than each epoch!
 import math
 import numpy as np
@@ -7,10 +7,15 @@ import numpy as np
 
 class CosAnnealingLR(object):
 
-    def __init__(self, loader_len, epochs, max_lr, min_lr=0, warmup_epochs=0, last_epoch=-1):
+    def __init__(self, epoch_size, epochs, max_lr, min_lr=1e-4, warmup_epochs=0, last_epoch=-1):
+    """
+    epoch_size: number of iterations in a epoch (length of dataloader);
+    epochs: total optimization epochs;
+    max_lr, min_lr: maximal and minimal learning rates;
+    """
 
-        max_iters = loader_len * epochs
-        warmup_iters = loader_len * warmup_epochs
+        max_iters = epoch_size * epochs
+        warmup_iters = epoch_size * warmup_epochs
         assert max_lr >= 0
         assert warmup_iters >= 0
         assert max_iters >= 0 and max_iters >= warmup_iters
@@ -22,7 +27,7 @@ class CosAnnealingLR(object):
         self.last_epoch = last_epoch
 
         assert self.last_epoch >= -1
-        self.iter_counter = (self.last_epoch+1) * loader_len
+        self.iter_counter = (self.last_epoch+1) * epoch_size
 
         self.lr = 0
     
@@ -49,7 +54,7 @@ class CosAnnealingLR(object):
 
 class MultiStepLR(object):
 
-    def __init__(self, loader_len, milestones, gamma=None, gammas=None, base_lr=0.1, warmup_epochs=0, last_epoch=-1):
+    def __init__(self, epoch_size, milestones, gamma=None, gammas=None, base_lr=0.1, warmup_epochs=0, last_epoch=-1):
 
         if gamma is not None and gammas is not None:
             raise ValueError("either specify gamma or gammas")
@@ -61,8 +66,8 @@ class MultiStepLR(object):
         assert isinstance(gammas, list)
         assert len(milestones) == len(gammas)
 
-        self.warmup_iters = warmup_epochs * loader_len
-        self.loader_len = loader_len
+        self.warmup_iters = warmup_epochs * epoch_size
+        self.epoch_size = epoch_size
         self.base_lr = base_lr
         self.lr = base_lr
         self.milestones = milestones
@@ -70,7 +75,7 @@ class MultiStepLR(object):
         self.last_epoch = last_epoch
 
         assert self.last_epoch >= -1
-        self.iter_counter = (self.last_epoch+1) * loader_len
+        self.iter_counter = (self.last_epoch+1) * epoch_size
 
         self.milestone_counter = 0
 
@@ -83,7 +88,7 @@ class MultiStepLR(object):
 
         else:
             if self.milestone_counter < len(self.milestones) and \
-               self.iter_counter == self.milestones[self.milestone_counter] * self.loader_len:
+               self.iter_counter == self.milestones[self.milestone_counter] * self.epoch_size:
 
                 self.lr = self.lr * self.gammas[self.milestone_counter]
                 self.milestone_counter += 1
