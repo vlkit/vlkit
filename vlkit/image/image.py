@@ -11,9 +11,9 @@ def isimg(path):
     path = path.lower()
     return any(path.endswith(ext) for ext in __img_ext__)
 
-def traverse_images(path):
+def traverse_folder(path):
     """
-    traverse a given folder for images
+    traverse a given folder to find image files
     input:  path to traverse for images
     return: a list containing all image paths
     """
@@ -39,11 +39,6 @@ def gray2rgb(x):
         return x
     else:
         raise ValueError("Unsupported shape: %s" % str(x.shape))
-
-def imread(path):
-    assert isfile(path), "%s does't exist!" % path
-    assert isimg(path), "%s seems not an image!" % path
-    return np.array(Image.open(path))
 
 def norm01(x):
     """
