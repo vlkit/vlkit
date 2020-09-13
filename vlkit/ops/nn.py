@@ -18,7 +18,7 @@ def upsample_filter(size):
 
     return torch.tensor(weights)
 
-def deconv_upsample(channels, stride):
+def deconv_upsample(channels, stride, fixed=True):
     assert stride % 2 == 0
     padding = stride // 2
     kernel_size = stride * 2
@@ -26,6 +26,8 @@ def deconv_upsample(channels, stride):
     upsample = nn.ConvTranspose2d(channels, channels, kernel_size, stride=stride,
       padding=padding,output_padding=0, groups=channels,bias=False)
     upsample.weight.data.copy_(upsample_filter(kernel_size))
-    upsample.weight.requires_grad = False
+
+    if fixed:
+        upsample.weight.requires_grad = False
 
     return upsample
