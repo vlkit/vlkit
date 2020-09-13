@@ -19,6 +19,11 @@ def upsample_filter(size):
     return torch.tensor(weights)
 
 def deconv_upsample(channels, stride, fixed=True):
+    """
+    channels: number of input/output channels
+    stride: upsampling factor
+    fixed: whether fix deconv parameters (default: True)
+    """
     assert stride % 2 == 0
     padding = stride // 2
     kernel_size = stride * 2
