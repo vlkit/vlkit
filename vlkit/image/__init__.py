@@ -1,2 +1,1 @@
-from rgb import *
-from image import *
+from .image import *
