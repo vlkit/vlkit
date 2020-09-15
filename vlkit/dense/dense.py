@@ -62,3 +62,24 @@ def dense2flux(density, kernel_size=9, normalize=True):
         flux /= norm
 
     return flux
+
+
+def quantize_angle(angle, num_bins=8):
+    """
+    angle: angle map with shape [H, W]
+    num_bins: number of quantization bins
+    """
+    # clamp angle
+    angle[angle>=np.pi*2] = np.pi*2 - 1e-5
+    q = np.round(angle / (np.pi*2/num_bins)).astype(np.uint8)
+    q[q==num_bins] = 0
+    return q
+
+def dequantize_angle(q, num_bins=8):
+    """
+    q: quantized angles (0~num_bins-1)
+    num_bins: number of quantized levels
+    """
+    assert q.min() >= 0 and q.max() < num_bins
+    angle = q * (np.pi*2 / num_bins)
+    return angle
