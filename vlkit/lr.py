@@ -8,11 +8,11 @@ import numpy as np
 class CosAnnealingLR(object):
 
     def __init__(self, epoch_size, epochs, max_lr, min_lr=1e-4, warmup_epochs=0, last_epoch=-1):
-    """
-    epoch_size: number of iterations in a epoch (length of dataloader);
-    epochs: total optimization epochs;
-    max_lr, min_lr: maximal and minimal learning rates;
-    """
+        """
+        epoch_size: number of iterations in a epoch (length of dataloader);
+        epochs: total optimization epochs;
+        max_lr, min_lr: maximal and minimal learning rates;
+        """
 
         max_iters = epoch_size * epochs
         warmup_iters = epoch_size * warmup_epochs
@@ -56,8 +56,9 @@ class MultiStepLR(object):
 
     def __init__(self, epoch_size, milestones, gamma=None, gammas=None, base_lr=0.1, warmup_epochs=0, last_epoch=-1):
 
-        if gamma is not None and gammas is not None:
-            raise ValueError("either specify gamma or gammas")
+        if (gamma is not None and gammas is not None) or \
+           (gamma is None and gammas is None):
+            raise ValueError("You should specify either specify gamma or gammas.")
 
         if gamma is not None:
             gammas = [gamma] * len(milestones)
@@ -94,3 +95,4 @@ class MultiStepLR(object):
                 self.milestone_counter += 1
 
         return self.lr
+
