@@ -15,16 +15,19 @@ def sobel(x, kernel_size=3):
 
 def flux2angle(flux):
     """
-    flux: a [2, H, W] tesnro represents the flux vector of each position
+    computing orientation angle for each pixel given a flux
+    input:
+      flux: a [2, H, W] tensor represents the flux vector of each position
+    return:
+      angle: a [H, W] matrix representing angle of each location
     """
-    _, H, W = flux.shape
+    C, H, W = flux.shape
+    assert C == 2
     top_half = flux[0,...] >= 0 # y >= 0, \theta <= \pi
     bottom_half = flux[0,...] < 0 # y < 0, \theta > \pi
 
-    # unit vector [y=0, x=1]
     unit = np.zeros((2, H, W), dtype=np.float32)
-    unit[1,...] = 1
-
+    unit[1,...] = 1 # unit vector: (y=0, x=1)
     cos = (flux * unit).sum(axis=0)
     acos = np.arccos(cos)
     angle = np.zeros((H, W), dtype=np.float32)
@@ -32,3 +35,30 @@ def flux2angle(flux):
     angle[bottom_half] = 2*np.pi - acos[bottom_half]
 
     return angle
+
+def angle2flux(angle):
+    """
+    The inverse of `flux2angle`
+    """
+    return np.dstack((np.sin(angle), np.cos(angle))).transpose((2,0,1))
+
+def dense2flux(density, kernel_size=9, normalize=True):
+    """
+    Compute flux field of a density map
+    input:
+      density: density map with shape [H, W]
+    output:
+      flux: flux field of shape [2, H, W]
+      
+    """
+    sobelx = cv2.Sobel(density, cv2.CV_64F, 1, 0, ksize=kernel_size)
+    sobely = cv2.Sobel(density, cv2.CV_64F, 0, 1, ksize=kernel_size)
+
+    flux = np.dstack((sobely, sobelx)).transpose((2,0,1))
+
+    if normalize:
+        norm = np.expand_dims(np.sqrt((flux**2).sum(axis=0)), axis=0)
+        norm[norm==0] = 1
+        flux /= norm
+
+    return flux
