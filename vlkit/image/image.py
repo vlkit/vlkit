@@ -21,7 +21,7 @@ def traverse_folder(path):
     for p in os.listdir(path):
         p1 = abspath(join(path, p))
         if isdir(p1):
-            images += traverse_images(p1)
+            images += traverse_folder(p1)
         elif isimg(p1):
             images.append(p1)
         else:
