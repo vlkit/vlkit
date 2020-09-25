@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from PIL import Image
 from os.path import isfile
-from .image import isimg, norm255
+from .image import isimg
 
 def imread(path, backend="pil", grayscale=False):
     assert isfile(path) and isimg(path)
@@ -16,11 +16,9 @@ def imread(path, backend="pil", grayscale=False):
     else:
         raise ValueError("Invalid backend %s. (Valid options are ['pil', 'cv2'])" % backend)
 
-def imwrite(im, path, backend="pil", normalize=False):
+def imwrite(im, path, backend="pil"):
     assert isinstance(im, np.ndarray)
     assert isimg(path)
-    if normalize:
-        im = norm255(im)
     if backend == "pil":
         Image.fromarray(im).save(path)
     elif backend == "cv2":
