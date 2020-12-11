@@ -7,6 +7,8 @@ __version__ = "0.1.0b1"
 
 exts = [Extension(name='vlkit.nms.nms_ext',
                   sources=["vlkit/nms/_nms_ext.c", "vlkit/nms/nms_ext.pyx"],
+                  extra_compile_args=["-std=c99"],
+                  extra_link_args=["-std=c99"],
                   include_dirs=["vlkit/nms"])]
 
 
