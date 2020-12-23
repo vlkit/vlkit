@@ -1,9 +1,10 @@
 import torch
 import torchvision
 import torchvision.transforms as transforms
-import torchvision.datasets as datasets
-from PIL import Image
 from torchvision.datasets.folder import pil_loader
+import torchvision.datasets as datasets
+import numpy as np
+from PIL import Image
 import vlkit.image as vlimage
 import os, sys
 from os.path import join, split, splitext, abspath, dirname, isfile, isdir
@@ -124,6 +125,39 @@ class CACDDataset(torch.utils.data.Dataset):
         im = pil_loader(join(self.root, filename))
 
         return im, age
+
+    def __len__(self):
+        return len(self.items)
+
+class FileListDataset(torch.utils.data.Dataset):
+
+    def __init__(self, filelist, root=None, transform=None, return_path=False):
+
+        assert isfile(filelist)
+        self.root = root
+        self.transform = transform
+        self.return_path = return_path
+
+        self.items = [i.strip().split(" ") for i in open(filelist)]
+        if root is not None:
+            self.items = [[join(root, i[0]), i[1]] for i in self.items]
+
+        self.num_classes = np.unique(np.array([int(i[1]) for i in self.items])).size
+
+    def __getitem__(self, index):
+
+        fpath, target = self.items[index]
+        assert isfile(fpath), fpath
+        target = int(target)
+        im = pil_loader(fpath)
+
+        if self.transform is not None:
+            im = self.transform(im)
+
+        if self.return_path:
+            return im, target, fpath
+        else:
+            return im, target
 
     def __len__(self):
         return len(self.items)
