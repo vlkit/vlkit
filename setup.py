@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 from setuptools import Extension
 from distutils.command.build import build as build_orig
 
-__version__ = "0.1.0b1"
+__version__ = "0.1.0b3"
 
 exts = [Extension(name='vlkit.nms.nms_ext',
                   sources=["vlkit/nms/_nms_ext.c", "vlkit/nms/nms_ext.pyx"],
