@@ -38,14 +38,14 @@ def deconv_upsample(channels, stride, fixed=True):
     return upsample
 
 class ArcFace(nn.Module):
-    """ 
+    """
     ArcFace https://arxiv.org/pdf/1801.07698
     """
     def __init__(self, in_features, out_features, s=32, m=0.5):
         super(ArcFace, self).__init__()
         self.weight = nn.Parameter(torch.zeros(out_features, in_features))
-        self.s = s 
-        self.m = m 
+        self.s = s
+        self.m = m
         self.cos_m = math.cos(self.m)
         self.sin_m = math.sin(self.m)
 
@@ -62,7 +62,7 @@ class ArcFace(nn.Module):
             return cosine
 
         # sin(theta)
-        sine = torch.sqrt(1.0 - torch.pow(cosine, 2)) 
+        sine = torch.sqrt(1.0 - torch.pow(cosine, 2))
 
         # psi = cos(theta + m)
         psi_theta = cosine*self.cos_m - sine*self.sin_m
