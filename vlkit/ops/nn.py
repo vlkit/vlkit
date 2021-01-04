@@ -78,9 +78,7 @@ class ArcFace(nn.Module):
     def __str__(self):
         return "ArcFace() in_features=%d out_features=%d s=%.3f m=%.3f" % \
                (self.weight.shape[1], self.weight.shape[0], self.s, self.m)
-
     def __repr__(self):
         return self.__str__()
-
     def extra_repr(self):
         return self.__str__()
