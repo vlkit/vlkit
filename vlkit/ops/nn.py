@@ -65,7 +65,7 @@ class ArcFace(nn.Module):
         cosine = F.linear(F.normalize(input), F.normalize(self.weight))
 
         if label is None or self.m == 0:
-            return cosine
+            return cosine * self.s, cosine.detach() * self.s
 
         if self.ada_m:
             self.iter = self.iter + 1
@@ -85,10 +85,11 @@ class ArcFace(nn.Module):
         psi_theta = cosine * self.cos_m - sine * self.sin_m
         psi_theta = torch.where(cosine > -self.cos_m, psi_theta, -psi_theta - 2)
 
-        one_hot = torch.zeros_like(cosine)
+        one_hot = torch.zeros_like(cosine).byte()
         one_hot.scatter_(1, label.view(-1, 1).long(), 1)
 
-        output = (one_hot*psi_theta + (1-one_hot)*cosine) * self.s
+        # output = (one_hot*psi_theta + (1-one_hot)*cosine) * self.s
+        output = torch.where(one_hot, psi_theta, cosine)
 
         if self.return_m:
             return output, cosine.detach() * self.s, m
@@ -96,8 +97,9 @@ class ArcFace(nn.Module):
             return output, cosine.detach() * self.s
 
     def __str__(self):
-        return "ArcFace() in_features=%d out_features=%d s=%.3f m=%.3f" % \
-               (self.weight.shape[1], self.weight.shape[0], self.s, self.m)
+        return "ArcFace() in_features=%d out_features=%d s=%.3f m=%.3f ada_m=%s warmup_iters=%d" % \
+               (self.weight.shape[1], self.weight.shape[0],
+                       self.s, self.m, str(self.ada_m), self.warmup_iters)
     def __repr__(self):
         return self.__str__()
     def extra_repr(self):
