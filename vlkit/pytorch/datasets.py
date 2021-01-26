@@ -154,10 +154,8 @@ class FileListDataset(torch.utils.data.Dataset):
         if self.transform is not None:
             im = self.transform(im)
 
-        if self.return_path:
-            return im, target, fpath
-        else:
-            return im, target
+        return {"image": im, "target": target, "path": fpath}
+
 
     def __len__(self):
         return len(self.items)
